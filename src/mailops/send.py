@@ -41,7 +41,7 @@ def send_mail_with_template_vars(csv_file: str, env_path: str, template_path: st
                 if not to_email:
                     print("Fila sin 'email'. Omitida.")
                     continue
-                password = get_field(row, "password", "contrasena")
+                password = get_field(row, "password", "contrasena") or genpass(PASS_LEN)
                 vars = {**row, "password": password, "email": to_email}
                 try:
                     cuerpo = template_str.format(**vars)

@@ -1,4 +1,4 @@
-import os, secrets, string
+import os, secrets, string, csv
 from dotenv import load_dotenv
 
 def load_env(path: str) -> None:
@@ -22,3 +22,26 @@ def get_field(row: dict, *keys: str) -> str:
         if v:
             return v
     return ""
+
+def ensure_passwords(csv_file: str, pass_len: int) -> None:
+    rows = []
+    with open(csv_file, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames or []
+        # asegurar que exista la columna "password"
+        if "password" not in fieldnames:
+            fieldnames.append("password")
+
+        for row in reader:
+            if not row.get("password") and not row.get("contrasena"):
+                row["password"] = genpass(pass_len)
+            elif row.get("contrasena") and not row.get("password"):
+                # normalizar a la misma clave
+                row["password"] = row["contrasena"]
+            rows.append(row)
+
+    # sobrescribir el CSV con las contraseñas completadas
+    with open(csv_file, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)

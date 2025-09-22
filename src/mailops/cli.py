@@ -3,6 +3,8 @@ from pathlib import Path
 from .send import  send_mail_with_template_vars, send_mail_simple
 from .reset import reset_from_csv
 from .create import create_from_csv
+from .utils import ensure_passwords
+from .config import PASS_LEN
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ENV_SEND  = ROOT / ".env.send"
@@ -32,6 +34,7 @@ def main():
         if a.simple:
             send_mail_simple(a.csv, a.env, a.template, a.subject)
         else:
+            ensure_passwords(a.csv, PASS_LEN)
             send_mail_with_template_vars(a.csv, a.env, a.template, a.subject)
     elif a.cmd == "reset":
         reset_from_csv(a.csv, a.env)
